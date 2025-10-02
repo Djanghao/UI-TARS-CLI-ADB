@@ -19,7 +19,7 @@
     "build": "rslib build",
     "build:watch": "rslib build --watch",
     "dev": "rslib build --watch",
-    "start": "node bin/index.js",
+    "start": "node bin/index.js start",
     "prepare": "npm run build",
     "test": "vitest"
   },

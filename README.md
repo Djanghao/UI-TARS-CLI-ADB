@@ -1,241 +1,158 @@
-# UI-TARS CLI + ADB
+# UI-TARS CLI
 
-A specialized command-line tool for UI-TARS focused exclusively on **Android device automation via ADB (Android Debug Bridge)**. This is a streamlined extraction from the larger UI-TARS-desktop project, containing only the essential components needed for CLI-driven ADB operations.
+A command-line interface for automating Android devices via ADB using self-hosted UI-TARS or OpenAI-compatible vision-language models.
 
-## 🎯 Project Scope
+## Overview
 
-### ✅ Included Features
-- **CLI Interface** - Command-line tool for ADB automation
-- **ADB Operator** - Android device interaction via ADB commands
-- **UI-TARS SDK Core** - Essential GUIAgent, Model, and Action Parser
-- **Model Integration** - OpenAI-compatible API support for vision-language models
-- **Action Parsing** - Parse model predictions into ADB commands
+UI-TARS CLI enables automated control of Android devices through natural language commands. It leverages vision-language models to interpret screenshots and execute actions via Android Debug Bridge (ADB), providing an intelligent automation layer for mobile testing, scripting, and task automation.
 
-### ❌ Explicitly Excluded Features
-- Browser automation (Puppeteer, Playwright, etc.)
-- Desktop/computer control (NutJS, system automation)
-- Electron-based desktop applications
-- Web UI interfaces
-- Any non-ADB device operators
-- Server/headless modes
-- Multi-modal agents beyond ADB
+## Prerequisites
 
-## 🚀 Quick Start
+- **Node.js** 18 or higher
+- **ADB (Android Debug Bridge)** installed and available in PATH
+- **Android Device** with USB debugging enabled
+- **Vision-Language Model API** - OpenAI-compatible endpoint (GPT-4 Vision, Claude, UI-TARS, etc.)
 
-### Prerequisites
-
-1. **ADB (Android Debug Bridge)** - Must be installed and accessible in PATH
-2. **Android Device** - Connected via USB with USB debugging enabled
-3. **Node.js** - Version 18 or higher
-4. **Vision-Language Model API** - OpenAI-compatible API (GPT-4 Vision, Claude, etc.)
-
-### Installation
+## Installation
 
 ```bash
-# Clone this repository
-git clone <repository-url>
+git clone https://github.com/Djanghao/UI-TARS-CLI-ADB
 cd UI-TARS-CLI-ADB
-
-# Install dependencies
 npm install
-
-# Build the project
 npm run build
-
-# Make CLI globally available (optional)
-npm link
 ```
 
-### Basic Usage
+## Quick Start
+
+### Interactive Mode (Recommended)
+
+Launch the CLI with interactive prompts:
 
 ```bash
-# Start with interactive prompts
 npm start
-
-# Or use the built CLI directly
-node bin/index.js start
-
-# Provide configuration via command line
-npm start -- start \
-  --baseURL "https://api.openai.com/v1" \
-  --apiKey "your-api-key" \
-  --model "gpt-4-vision-preview" \
-  --query "Open WhatsApp and send 'Hello' to John"
-
-# Use with preset configuration
-npm start -- start \
-  --presets "https://example.com/config.yaml" \
-  --query "Take a screenshot and scroll down"
 ```
 
-## 📱 ADB Setup
+On first run, you will be prompted to configure:
+- **Base URL**: API endpoint (e.g., `http://localhost:8000/v1`)
+- **API Key**: Authentication key (use any non-empty string for servers without auth)
+- **Model**: Model identifier (e.g., `ui-tars`, `gpt-4-vision-preview`)
 
-### Enable USB Debugging on Android
-
-1. Go to **Settings** > **About phone**
-2. Tap **Build number** 7 times to enable Developer options
-3. Go to **Settings** > **Developer options**
-4. Enable **USB debugging**
-5. Connect device via USB and authorize the computer
-
-### Verify ADB Connection
-
-```bash
-# Check if device is detected
-adb devices
-
-# Should show something like:
-# List of devices attached
-# ABCD1234567890    device
-```
-
-### Chinese Input Support (Optional)
-
-For Chinese text input, install ADBKeyboard:
-
-```bash
-# Download ADBKeyboard.apk from GitHub
-# Install it on your device
-adb install ADBKeyboard.apk
-
-# Activate the input method
-adb shell ime set com.android.adbkeyboard/.AdbIME
-```
-
-## 🎮 Supported ADB Actions
-
-The ADB operator supports the following actions:
-
-- **click(start_box='[x1, y1, x2, y2]')** - Tap on screen coordinates
-- **type(content='text')** - Input text (supports Chinese with ADBKeyboard)
-- **swipe(start_box='[x1, y1, x2, y2]', end_box='[x3, y3, x4, y4]')** - Swipe gesture
-- **scroll(start_box='[x1, y1, x2, y2]', direction='up/down/left/right')** - Scroll in direction
-- **hotkey(key='enter/back/home/backspace/delete/menu/power/volume_up/volume_down/mute/lock')** - Hardware keys
-- **wait()** - Wait 2 seconds and take screenshot
-- **press_home()** - Press home button
-- **finished()** - Complete the task
-- **call_user()** - Request user assistance
-
-## 📝 Configuration
-
-### Configuration File
-
-The CLI automatically creates `~/.ui-tars-adb-cli.json`:
+Configuration is saved to `ui-tars-cli.config.json`:
 
 ```json
 {
-  "baseURL": "https://api.openai.com/v1",
-  "apiKey": "your-api-key",
-  "model": "gpt-4-vision-preview"
+  "baseURL": "http://localhost:8000/v1",
+  "apiKey": "dummy",
+  "model": "ui-tars"
 }
 ```
 
-### Preset Configuration (YAML)
+### One-Shot Mode
 
-Create a YAML preset file:
-
-```yaml
-# config.yaml
-vlmApiKey: "your-api-key"          # or apiKey
-vlmBaseUrl: "https://api.openai.com/v1"  # or baseURL
-vlmModelName: "gpt-4-vision-preview"     # or model
-```
-
-Use with:
-```bash
-npm start -- start --presets "https://example.com/config.yaml"
-```
-
-## 🛠️ Development
-
-### Project Structure
-
-```
-UI-TARS-CLI-ADB/
-├── src/
-│   ├── cli/              # CLI commands and interface
-│   │   ├── commands.ts   # Command definitions
-│   │   └── start.ts      # Main CLI logic
-│   ├── operators/        # ADB operator implementation
-│   │   └── adb.ts        # ADB device automation
-│   ├── sdk/              # Core UI-TARS SDK components
-│   │   ├── gui-agent.ts  # Main agent orchestration
-│   │   ├── model.ts      # LLM API integration
-│   │   └── types.ts      # SDK type definitions
-│   ├── action-parser/    # Parse model outputs to actions
-│   │   └── index.ts      # Action parsing logic
-│   ├── shared/           # Shared utilities and types
-│   │   ├── types.ts      # Common type definitions
-│   │   ├── constants.ts  # Shared constants
-│   │   └── utils.ts      # Utility functions
-│   └── index.ts          # Main export file
-├── bin/
-│   └── index.js          # CLI entry point
-└── package.json          # Dependencies and scripts
-```
-
-### Build Commands
+Execute tasks directly with command-line arguments:
 
 ```bash
-# Development build with watch mode
-npm run dev
-
-# Production build
-npm run build
-
-# Run tests
-npm test
-
-# Start development version
-npm start
+npm start -- \
+  --baseURL "http://localhost:8000/v1" \
+  --apiKey "dummy" \
+  --model "ui-tars" \
+  --query "Go to home and open Settings"
 ```
 
-### Adding New Features
+## Configuration
 
-Since this project is focused exclusively on CLI + ADB functionality:
+The CLI automatically creates and reads `ui-tars-cli.config.json` in the project directory. You can manually edit this file or let the interactive mode generate it.
 
-1. **New ADB actions** - Extend the `AdbOperator` class in `src/operators/adb.ts`
-2. **CLI enhancements** - Modify `src/cli/commands.ts` and `src/cli/start.ts`
-3. **Model improvements** - Update `src/sdk/model.ts` for better LLM integration
+## Command-Line Options
 
-## 🔧 Troubleshooting
+| Option | Description |
+|--------|-------------|
+| `--query <text>` | Natural language task instruction |
+| `--baseURL <url>` | OpenAI-compatible API base URL (overrides config) |
+| `--apiKey <key>` | API authentication key (overrides config) |
+| `--model <name>` | Model identifier (overrides config) |
+| `--device <id>` | Target device ID (from `adb devices`) |
 
-### Common Issues
+## Device Management
 
-**"No Android devices found"**
-- Ensure USB debugging is enabled
-- Check `adb devices` shows your device
-- Try different USB cable or port
+The CLI automatically detects connected Android devices. If multiple devices are available, you will be prompted to select one, or you can specify a device directly:
 
-**"Permission denied"**
-- Grant computer access when prompted on Android device
-- Restart ADB: `adb kill-server && adb start-server`
+```bash
+npm start -- --device <device-id> --query "Take a screenshot"
+```
 
-**"Model API errors"**
-- Verify API key and base URL are correct
-- Check model name is supported by your API provider
-- Ensure sufficient API credits/quota
+List connected devices:
+```bash
+adb devices
+```
 
-**"Action parsing errors"**
-- Model output format might be incompatible
-- Try different model or adjust system prompt
-- Check model supports vision capabilities
+## Local Deployment with vLLM
 
-## 📄 License
+### Requirements
 
-Apache-2.0 - see LICENSE file for details.
+- vLLM >= 0.6.1 (recommended: 0.6.6)
+- CUDA-compatible GPU with sufficient VRAM
+- UI-TARS model weights
 
-## 🤝 Contributing
+### Install vLLM
 
-Since this is a focused extraction for CLI + ADB functionality only:
+```bash
+pip install -U transformers
+VLLM_VERSION=0.6.6
+CUDA_VERSION=cu124
+pip install vllm==${VLLM_VERSION} --extra-index-url https://download.pytorch.org/whl/${CUDA_VERSION}
+```
 
-1. Ensure changes relate to CLI or ADB functionality
-2. Do not add features outside the stated scope
-3. Test with real Android devices
-4. Follow existing code patterns and structure
+### Available UI-TARS Models
 
-## 📚 Related Projects
+- **ui-tars-2B-SFT** - Smallest, fastest
+- **ui-tars-7B-SFT** - Balanced performance
+- **ui-tars-7B-DPO** - Recommended for 7B tier
+- **ui-tars-72B-SFT** - High accuracy
+- **ui-tars-72B-DPO** - Best performance (recommended)
 
-- **UI-TARS-desktop** - Full desktop application with browser and system automation
-- **Android ADB Documentation** - https://developer.android.com/studio/command-line/adb
-- **OpenAI Vision API** - https://platform.openai.com/docs/guides/vision 
+### Launch vLLM Server
+
+```bash
+# For 7B models (tensor parallel = 1)
+python -m vllm.entrypoints.openai.api_server \
+  --served-model-name ui-tars \
+  --model <path-or-hf-repo> \
+  --limit-mm-per-prompt image=5 \
+  --tp 1
+
+# For 72B models (tensor parallel = 4)
+python -m vllm.entrypoints.openai.api_server \
+  --served-model-name ui-tars \
+  --model <path-or-hf-repo> \
+  --limit-mm-per-prompt image=5 \
+  --tp 4
+```
+
+Default endpoint: `http://localhost:8000`
+
+### Connect CLI to vLLM
+
+```bash
+npm start -- \
+  --baseURL "http://localhost:8000/v1" \
+  --apiKey "dummy" \
+  --model "ui-tars" \
+  --query "Open Weibo, go to Trending, scroll to read 10 items"
+```
+
+## Notes
+
+- The CLI captures screenshots and sends them to the vision-language model via OpenAI's `image_url` data URL format
+- `--limit-mm-per-prompt image=5` in vLLM matches the CLI's internal limit of 5 images per prompt
+- For servers without authentication, any non-empty string can be used as `--apiKey` (required by OpenAI SDK)
+
+## License
+
+Apache-2.0
+
+## Related Resources
+
+- [UI-TARS Models](https://huggingface.co/ByteDance-Seed/UI-TARS-72B-DPO)
+- [vLLM Documentation](https://docs.vllm.ai/)
+- [Android ADB Guide](https://developer.android.com/studio/command-line/adb)

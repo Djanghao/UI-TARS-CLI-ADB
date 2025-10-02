@@ -5,7 +5,6 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as os from 'node:os';
 import fetch from 'node-fetch';
 import * as p from '@clack/prompts';
 import * as yaml from 'js-yaml';
@@ -22,7 +21,7 @@ export interface CliOptions {
 }
 
 export const start = async (options: CliOptions) => {
-  const CONFIG_PATH = path.join(os.homedir(), '.ui-tars-adb-cli.json');
+  const CONFIG_PATH = path.join(process.cwd(), 'ui-tars-cli.config.json');
 
   // Read or initialize config
   let config = {
